@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+				list-style: none;
+				text-decoration: none;
+			}
+			#wrap{
+				width: 80%;
+				margin: auto;
+				text-align: center;
+				background-color: paleturquoise;
+			}
+			h3{
+				font:"微软雅黑";
+				color: palevioletred;
+			}
+			button{
+				width: 50px;
+				height: 40px;
+				border-radius: 20px;
+				background-color: aquamarine;
+			}
+			ul,li{
+				margin-top: 5px;
+			}
+			a{
+				width: 30px;
+				height: 30px;
+				border: solid 1px;
+				background-color: plum;
+			}
+			.li{
+				background: red;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="wrap">
+			<h3>说出心愿</h3>
+			<textarea name="" rows="5" cols="130" placeholder="请输入内容" id="textarea" value=""></textarea>
+			<button>提交</button>
+		<div id="boxd">
+			<div id="list"> 
+				<!--<ul>
+					<li>小可爱说：</li>
+					<li>希望你越来越漂亮</li>
+					<li><a href="#">删除</a></li>
+				</ul>-->
+				<ul></ul>
+			</div>
+		</div>
+</div>
+		<script type="text/javascript" src="js/ajax_v3.js" ></script>
+		<script type="text/javascript" src="js/jquery-1.11.1.min.js" ></script>
+		<script type="text/javascript">
+			//点击添加数据
+				$("button").click(function(){
+					ajax.get("http://localhost:8080/msg").then((res)=>{
+						
+						var data=JSON.parse(res);
+						var fla=0;
+						for (var i = 0; i < data.length; i++) {
+							if(data[i].tex==$("#textarea").val()){
+								fla=1;
+								break
+							}
+						}
+						if(fla==0){
+							ajax.get("http://localhost:8080/add",{
+							    tex:$("#textarea").val(),
+							    flag:0
+							}).then((res1)=>{
+								console.log(res1)
+								asd();
+								
+							})
+						}
+						
+						
+					})
+					
+					
+				})
+				
+				//渲染页面
+				asd()
+				function asd(){
+					ajax.get("http://localhost:8080/msg").then((res)=>{
+						console.log(res)
+						res=JSON.parse(res)
+						var str=""
+						var aa=""
+						for (var i = 0; i < res.length; i++) {
+							if(res[i].flag!=0){
+								aa="li";
+							}else{
+								aa=""
+							}
+							
+								str+=`
+								
+									<li style="color:red">小可爱说：</li>
+									<li class="${aa}">${res[i].tex}</li>
+									<li><a href="#" onclick="del('${res[i]._id}')">删除</a> <a href="#" onclick="ser('${res[i]._id}',this)">√</a></li>
+								
+						`
+						}
+						$("ul").html(str)
+						 tex:$("#textarea").val("")
+					})
+				}
+				
+				//删除一条数据
+				function del(id){
+					ajax.get("http://localhost:8080/del",{id}).then((res)=>{
+						console.log(res);
+						asd();
+					})
+				}
+				
+				function ser(id,obj){
+					ajax.get("http://localhost:8080/app",{id}).then((res)=>{
+					      asd()
+						$(obj).parent().parent().children(".li").css("background-color","red")
+					});
+					
+					
+					
+				}
+				
+	      
+		</script>
+	</body>
+</html>
